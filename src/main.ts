@@ -1,8 +1,52 @@
+import { Logger as NestLogger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import * as bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+
+// Check environement configuration
+import '@/config/env.validator';
+import { config } from '@/config/config';
+
+import { AppModule } from '@/app.module';
+import { corsOptionsDelegate } from '@/cors';
+
+//! Proxy settings, production only
+// <NestExpressApplication>
+// app.set('trust proxy', 1);
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+	const PORT = config.app.port;
+	const app = await NestFactory.create(AppModule, {
+		bufferLogs: true,
+	});
+	app.useGlobalPipes(
+		new ValidationPipe({
+			transform: true,
+			disableErrorMessages: false,
+			whitelist: true,
+			enableDebugMessages: true,
+		}),
+	);
+
+	app.use(cookieParser());
+	app.use(bodyParser.json({ limit: '1mb' }));
+	app.enableCors(corsOptionsDelegate);
+	// ! versioning, production only
+	// app.enableVersioning({
+	// 	type: VersioningType.URI,
+	// 	defaultVersion: '1',
+	// 	prefix: 'api/v',
+	// });
+	await app.listen(PORT);
+
+	return app.getUrl();
 }
-bootstrap();
+
+(async (): Promise<void> => {
+	try {
+		const url = await bootstrap();
+		NestLogger.debug(`Nest application running at : ${url}`, 'Bootstrap');
+	} catch (error) {
+		NestLogger.error(error, 'Bootstrap');
+	}
+})();

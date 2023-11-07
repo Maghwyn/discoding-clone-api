@@ -2,11 +2,11 @@ import { ObjectId } from 'mongodb';
 import { Response } from 'express';
 import { Body, Controller, Post, Res, UseFilters, UseGuards } from '@nestjs/common';
 
-import { AuthService } from '@/auth/auth.service';
+import { AuthService } from '@/routes/auth/auth.service';
 import { ServiceErrorCatcher } from '@/common/error/catch.service';
 import { LocalAuthGuard } from '@/common/guards/local.guard';
 import { JwtAuthGuard } from '@/common/guards/jwt.guard';
-import { createAuthCookie, expireAuthCookie } from '@/auth/utils/auth.cookie';
+import { createAuthCookie, expireAuthCookie } from '@/routes/auth/utils/auth.cookie';
 import { Jwt } from '@/common/decorators/jwt.decorator';
 import { Local } from '@/common/decorators/local.decorator';
 import {
@@ -14,7 +14,7 @@ import {
 	DTOAuthEmail,
 	DTOAuthSignup,
 	DTOResetPassword,
-} from '@/auth/dto/auth.dto';
+} from '@/routes/auth/dto/auth.dto';
 
 @Controller('auth')
 @UseFilters(ServiceErrorCatcher)

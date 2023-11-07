@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException, Logger as NestLogger } from '@nestjs/common';
 
 import { config } from '@/config/config';
-import { JwtTokenData, JwtPayload } from '@/auth/interfaces/jwt.interface';
+import { JwtTokenData, JwtPayload } from '@/routes/auth/interfaces/jwt.interface';
 import { convertToObjectId } from '@/common/helpers/string.helper';
 
 @Injectable()

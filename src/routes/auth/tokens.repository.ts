@@ -1,6 +1,6 @@
 import { Filter, UpdateFilter, Db, InsertOneOptions, DeleteOptions } from 'mongodb';
 import { Inject, Injectable } from '@nestjs/common';
-import { Token } from '@/auth/interfaces/tokens.interface';
+import { Token } from '@/routes/auth/interfaces/tokens.interface';
 
 @Injectable()
 export class TokensRepository {

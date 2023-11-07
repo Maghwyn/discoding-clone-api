@@ -10,7 +10,7 @@ import {
 	Document,
 } from 'mongodb';
 import { Inject, Injectable } from '@nestjs/common';
-import { User } from '@/users/interfaces/users.interface';
+import { User } from '@/routes/users/interfaces/users.interface';
 
 @Injectable()
 export class UsersRepository {

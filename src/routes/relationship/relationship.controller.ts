@@ -3,13 +3,13 @@ import { Controller, UseFilters, UseGuards } from '@nestjs/common';
 
 import { JwtAuthGuard } from '@/common/guards/jwt.guard';
 import { ServiceErrorCatcher } from '@/common/error/catch.service';
-import { FriendsService } from '@/routes/friends/friends.service';
+import { RelationshipsService } from '@/routes/relationship/relationship.service';
 
-@Controller('friends')
+@Controller('relationships')
 @UseGuards(JwtAuthGuard)
 @UseFilters(ServiceErrorCatcher)
-export class FriendsController {
-	constructor(private readonly friendsService: FriendsService) {}
+export class RelationshipsController {
+	constructor(private readonly relationshipsService: RelationshipsService) {}
 
 	// Create your own controller routes
 	// Available tag @Post() @Get() @Put() @Delete() @Patch()

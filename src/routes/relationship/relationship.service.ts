@@ -2,13 +2,13 @@ import { ObjectId } from 'mongodb';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
 import { ServiceError } from '@/common/error/catch.service';
-import { FriendsRepository } from '@/routes/friends/friends.repository';
+import { RelationshipsRepository } from '@/routes/relationship/relationship.repository';
 
 @Injectable()
-export class FriendsService {
+export class RelationshipsService {
 	constructor(
-		@Inject(forwardRef(() => FriendsRepository))
-		private readonly friendsRepository: FriendsRepository,
+		@Inject(forwardRef(() => RelationshipsRepository))
+		private readonly relationshipsRepository: RelationshipsRepository,
 	) {}
 
 	// Create your own business logic here

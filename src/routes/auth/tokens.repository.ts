@@ -9,7 +9,7 @@ export class TokensRepository {
 	}
 
 	get tokens() {
-		return this.db.collection<Token>('users');
+		return this.db.collection<Token>('tokens');
 	}
 
 	create(doc: Token, options?: InsertOneOptions) {

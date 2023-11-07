@@ -9,7 +9,7 @@ import { AuthModule } from '@/routes/auth/auth.module';
 import { UsersModule } from '@/routes/users/users.module';
 import { ChannelsModule } from '@/routes/channels/channels.module';
 import { ConversationsModule } from '@/routes/conversations/conversations.module';
-import { FriendsModule } from '@/routes/friends/friends.module';
+import { RelationshipsModule } from '@/routes/relationship/relationship.module';
 import { MessagesModule } from '@/routes/messages/messages.module';
 import { ServersModule } from '@/routes/servers/servers.module';
 
@@ -22,7 +22,7 @@ import { ServersModule } from '@/routes/servers/servers.module';
 		UsersModule,
 		ChannelsModule,
 		ConversationsModule,
-		FriendsModule,
+		RelationshipsModule,
 		MessagesModule,
 		ServersModule,
 	],

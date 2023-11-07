@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import { JwtService } from '@nestjs/jwt';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
-import { UsersService } from '@/users/users.service';
+import { UsersService } from '@/routes/users/users.service';
 import { ServiceError } from '@/common/error/catch.service';
 import {
 	argonVerify,
@@ -10,10 +10,10 @@ import {
 	generateRandomToken,
 	hash,
 } from '@/common/helpers/string.helper';
-import { DTOActivationToken, DTOAuthSignup, DTOResetPassword } from '@/auth/dto/auth.dto';
-import { AuthEventEmitter } from '@/auth/events/auth.events';
-import { TokensRepository } from '@/auth/tokens.repository';
-import { TokenEnum } from '@/auth/interfaces/tokens.interface';
+import { DTOActivationToken, DTOAuthSignup, DTOResetPassword } from '@/routes/auth/dto/auth.dto';
+import { AuthEventEmitter } from '@/routes/auth/events/auth.events';
+import { TokensRepository } from '@/routes/auth/tokens.repository';
+import { TokenEnum } from '@/routes/auth/interfaces/tokens.interface';
 
 @Injectable()
 export class AuthService {

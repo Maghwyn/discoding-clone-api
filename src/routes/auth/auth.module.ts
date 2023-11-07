@@ -3,15 +3,15 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
 import { config } from '@/config/config';
-import { AuthService } from '@/auth/auth.service';
-import { AuthController } from '@/auth/auth.controller';
-import { JwtStrategy } from '@/auth/strategies/jwt.strategy';
-import { LocalStrategy } from '@/auth/strategies/local.strategy';
-import { UsersModule } from '@/users/users.module';
-import { AuthEventEmitter } from '@/auth/events/auth.events';
+import { AuthService } from '@/routes/auth/auth.service';
+import { AuthController } from '@/routes/auth/auth.controller';
+import { JwtStrategy } from '@/routes/auth/strategies/jwt.strategy';
+import { LocalStrategy } from '@/routes/auth/strategies/local.strategy';
+import { UsersModule } from '@/routes/users/users.module';
+import { AuthEventEmitter } from '@/routes/auth/events/auth.events';
 import { MailjetListeners } from '@/mailjet/mailjet.listeners';
 import { MailjetModule } from '@/mailjet/mailjet.module';
-import { TokensRepository } from '@/auth/tokens.repository';
+import { TokensRepository } from '@/routes/auth/tokens.repository';
 import { DatabaseModule } from '@/database/database.module';
 
 @Module({

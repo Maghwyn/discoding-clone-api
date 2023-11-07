@@ -3,7 +3,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 
 import { config } from '@/config/config';
 import { MailjetService } from '@/mailjet/mailjet.service';
-import { MailjetEmail, MailjetAskToken } from '@/auth/events/auth.events.req';
+import { MailjetEmail, MailjetAskToken } from '@/routes/auth/events/auth.events.req';
 import { Events, MailjetTemplate } from '@/mailjet/interfaces/events.interface';
 
 Injectable();

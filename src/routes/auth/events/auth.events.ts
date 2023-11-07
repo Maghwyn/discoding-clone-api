@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { MailjetEmail, MailjetAskToken } from '@/auth/events/auth.events.req';
+import { MailjetEmail, MailjetAskToken } from '@/routes/auth/events/auth.events.req';
 import { Events } from '@/mailjet/interfaces/events.interface';
 
 @Injectable()

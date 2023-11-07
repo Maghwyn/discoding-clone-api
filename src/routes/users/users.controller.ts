@@ -4,9 +4,9 @@ import { Controller, Get, Res, UseFilters, UseGuards } from '@nestjs/common';
 
 import { JwtAuthGuard } from '@/common/guards/jwt.guard';
 import { Jwt } from '@/common/decorators/jwt.decorator';
-import { UsersService } from '@/users/users.service';
+import { UsersService } from '@/routes/users/users.service';
 import { ServiceErrorCatcher } from '@/common/error/catch.service';
-import { USER_EMAIL_PROJECTION } from '@/users/utils/users.projection';
+import { USER_EMAIL_PROJECTION } from '@/routes/users/utils/users.projection';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)

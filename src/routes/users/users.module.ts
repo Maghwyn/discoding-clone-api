@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 
 import { DatabaseModule } from '@/database/database.module';
-import { UsersController } from '@/users/users.controller';
-import { UsersRepository } from '@/users/users.repository';
-import { UsersService } from '@/users/users.service';
+import { UsersController } from '@/routes/users/users.controller';
+import { UsersRepository } from '@/routes/users/users.repository';
+import { UsersService } from '@/routes/users/users.service';
 
 @Module({
 	imports: [DatabaseModule.forRoot()],

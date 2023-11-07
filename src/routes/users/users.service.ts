@@ -1,8 +1,8 @@
 import { AggregateOptions, Filter, FindOneAndUpdateOptions, ObjectId, Document } from 'mongodb';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
-import { UsersRepository } from '@/users/users.repository';
-import { User } from '@/users/interfaces/users.interface';
+import { UsersRepository } from '@/routes/users/users.repository';
+import { User } from '@/routes/users/interfaces/users.interface';
 import { KeysRequired } from '@/common/interfaces/advanced.interface';
 
 @Injectable()

@@ -50,7 +50,7 @@ export class AuthService {
 		const passwordMatch = await argonVerify(user.password, password);
 		if (!passwordMatch) return null;
 
-		if (!user.isActivated) return null;
+		//if (!user.isActivated) return null;
 		else return user._id;
 	}
 

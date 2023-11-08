@@ -14,7 +14,9 @@ export class ServersRepository {
 	create(doc: Server, options?: InsertOneOptions) {
 		return this.servers.insertOne(doc, options);
 	}
-
+	findServers(filter? : Filter<Server>){
+		return this.servers.find(filter).toArray();
+	}
 	findOne(filter: Filter<Server>, options?: FindOptions<Document>) {
 		return this.servers.findOne(filter, options);
 	}

@@ -29,7 +29,14 @@ export const directMessagesPipeline = (userId: ObjectId): Document[] => {
 		{
 			$project: {
 				id: '$_id',
-				avatarUrl: {
+				userId: {
+					$cond: {
+						if: { $eq: ['$userIdA', userId] },
+						then: { $arrayElemAt: ['$userB._id', 0] },
+						else: { $arrayElemAt: ['$userA._id', 0] },
+					},
+				},
+				userPicture: {
 					$cond: {
 						if: { $eq: ['$userIdA', userId] },
 						then: { $arrayElemAt: ['$userB.avatarUrl', 0] },

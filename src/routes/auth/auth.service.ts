@@ -35,7 +35,7 @@ export class AuthService {
 
 		await this.usersService.createUser({
 			email: payload.email,
-			username: payload.username,
+			username: payload.username.toLowerCase().trim(),
 			password: hashedPassword,
 			isActivated: false,
 			createdAt: new Date(),

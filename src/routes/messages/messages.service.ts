@@ -10,6 +10,7 @@ import { Conversation } from '@/routes/conversations/interfaces/conversations.in
 import { RelationshipsService } from '@/routes/relationship/relationship.service';
 import { RelationshipType } from '@/routes/relationship/interfaces/relationship.interface';
 import { channelMessagesPipeline } from '@/routes/messages/utils/messages.pipeline';
+import { UsersService } from '@/routes/users/users.service';
 
 @Injectable()
 export class MessagesService {
@@ -20,11 +21,16 @@ export class MessagesService {
 		private readonly conversationsService: ConversationsService,
 		@Inject(forwardRef(() => RelationshipsService))
 		private readonly relationshipsService: RelationshipsService,
+		@Inject(forwardRef(() => UsersService))
+		private readonly usersService: UsersService,
 	) {}
 
 	async createPrivateMessage(userId: ObjectId, interlocutorStrId: string, content: string) {
 		let conversationId: ObjectId;
 		const interlocutorId = convertToObjectId(interlocutorStrId);
+		const user = await this.usersService.getUserFrom({ _id: interlocutorId });
+		if (!user) throw new ServiceError('NOT_FOUND', 'User not found');
+
 		const relationship = await this.relationshipsService.retrieveFrom({
 			$or: [
 				{ userIdA: userId, userIdB: interlocutorId },
@@ -72,6 +78,12 @@ export class MessagesService {
 		await this.messagesRepository.create(message);
 		// TODO: Dispatch socket from interlocutorId
 		// TODO: Dispatch socket from userId
+		return {
+			id: conversationId,
+			userId: user._id,
+			pictureUrl: user.avatarUrl,
+			username: user.username,
+		};
 	}
 
 	async editMessage(userId: ObjectId, messageStrId: string, content: string) {

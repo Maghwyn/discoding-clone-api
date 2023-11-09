@@ -17,8 +17,8 @@ export class MessagesController {
 
 	@Post('/private')
 	async sendMessage(@Jwt() userId: ObjectId, @Body() body: DTOSendPrivateMessage, @Res() res: Response) {
-		await this.messagesService.createPrivateMessage(userId, body.contextId, body.content);
-		return res.status(201).json();
+		const conversationId = await this.messagesService.createPrivateMessage(userId, body.contextId, body.content);
+		return res.status(201).json(conversationId);
 	}
 
 	@Delete('/private/:id')

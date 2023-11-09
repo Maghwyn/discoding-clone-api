@@ -1,11 +1,12 @@
 import { Response } from 'express';
-import { Controller, Get, Res, UseFilters, UseGuards } from '@nestjs/common';
+import { ObjectId } from 'mongodb';
+import { Body, Controller, Get, Post, Res, UseFilters, UseGuards } from '@nestjs/common';
 
+import { Jwt } from '@/common/decorators/jwt.decorator';
 import { JwtAuthGuard } from '@/common/guards/jwt.guard';
 import { ServiceErrorCatcher } from '@/common/error/catch.service';
 import { ConversationsService } from '@/routes/conversations/conversations.service';
-import { Jwt } from '@/common/decorators/jwt.decorator';
-import { ObjectId } from 'mongodb';
+import { DTOEmptyConversation } from '@/routes/conversations/dto/conversations.dto';
 
 @Controller('conversations')
 @UseGuards(JwtAuthGuard)
@@ -13,9 +14,15 @@ import { ObjectId } from 'mongodb';
 export class ConversationsController {
 	constructor(private readonly conversationsService: ConversationsService) {}
 
-	@Get('')
+	@Get()
 	async getAllConversations(@Jwt() userId: ObjectId, @Res() res: Response) {
 		const directMessages = await this.conversationsService.retrieveMyConversations(userId);
+		return res.status(200).json(directMessages);
+	}
+
+	@Post()
+	async createEmptyConversations(@Jwt() userId: ObjectId, @Body() body: DTOEmptyConversation, @Res() res: Response) {
+		const directMessages = await this.conversationsService.createEmptyConversation(userId, body.userId);
 		return res.status(200).json(directMessages);
 	}
 

@@ -4,6 +4,7 @@ import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { ServiceError } from '@/common/error/catch.service';
 import { ChannelsRepository } from '@/routes/channels/channels.repository';
 import { ServersService } from '@/routes/servers/servers.service';
+import { DTOchannelCreate, DTOChannelUpdate } from "@/routes/channels/dto/channels.dto";
 
 @Injectable()
 export class ChannelsService {
@@ -14,6 +15,34 @@ export class ChannelsService {
 		private readonly channelsRepository: ChannelsRepository,
 	) {}
 
+	public createChannel(Channel: DTOchannelCreate) {
+		return this.channelsRepository.create({
+			name: Channel.name,
+			_id: new ObjectId(),
+			createdAt: new Date(),
+			type: Channel.type,
+			isDefault: false,
+			serverId: new ObjectId(Channel.serverId)
+		});
+	}
+
+	getChannels(serverId : string) {
+		return this.channelsRepository.findChannels({ serverId: new ObjectId(serverId) });
+	}
+
+	deleteChannels(channelId: string) {
+		return this.channelsRepository.deleteOne({ _id: new ObjectId(channelId) });
+	}
+
+	updateChannel(channel: DTOChannelUpdate) {
+		return this.channelsRepository.findOneAndUpdate({
+			_id: new ObjectId(channel._id),
+		}, {
+			$set: {
+				name: channel.name,
+			}
+		});
+	}
 	// Create your own business logic here
 	// If the function is async but does not await something, we don't add the modifier async to the function
 	// Just keep that in mind

@@ -4,6 +4,7 @@ import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { ServiceError } from '@/common/error/catch.service';
 import { ConversationsRepository } from '@/routes/conversations/conversations.repository';
 import { Conversation } from '@/routes/conversations/interfaces/conversations.interface';
+import { directMessagesPipeline } from '@/routes/conversations/utils/conversations.pipeline';
 
 @Injectable()
 export class ConversationsService {
@@ -18,6 +19,14 @@ export class ConversationsService {
 
 	retrieveFrom(filter: Filter<Conversation>) {
 		return this.conversationsRepository.findOne(filter);
+	}
+
+	retrieveMyConversations(userId: ObjectId) {
+		return this.conversationsRepository.aggregate(directMessagesPipeline(userId));
+	}
+
+	channelExistsById(channelId: ObjectId) {
+		return this.conversationsRepository.exists({ _id: channelId });
 	}
 
 	// Create your own business logic here

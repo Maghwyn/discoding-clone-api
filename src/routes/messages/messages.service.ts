@@ -72,6 +72,7 @@ export class MessagesService {
 		await this.messagesRepository.create(message);
 		// TODO: Dispatch socket from interlocutorId
 		// TODO: Dispatch socket from userId
+		return conversationId;
 	}
 
 	async editMessage(userId: ObjectId, messageStrId: string, content: string) {

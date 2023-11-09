@@ -22,6 +22,14 @@ export class ConversationsService {
 		const interlocutorId = convertToObjectId(interlocutorStrId);
 		const user = await this.usersService.getUserFrom({ _id: interlocutorId });
 		if (!user) throw new ServiceError('NOT_FOUND', 'User not found');
+
+		const conv = this.retrieveFrom({
+			$or: [
+				{ userIdA: userId, userIdB: interlocutorId },
+				{ userIdA: interlocutorId, userIdB: user }
+			]
+		})
+		if (conv) throw new ServiceError('BAD_REQUEST', 'Channel already exist')
 		
 		const res = await this.createConversation({
 			userIdA: userId,

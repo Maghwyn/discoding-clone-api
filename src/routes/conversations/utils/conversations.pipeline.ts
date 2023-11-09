@@ -28,6 +28,7 @@ export const directMessagesPipeline = (userId: ObjectId): Document[] => {
 		},
 		{
 			$project: {
+				_id: 0,
 				id: '$_id',
 				userId: {
 					$cond: {

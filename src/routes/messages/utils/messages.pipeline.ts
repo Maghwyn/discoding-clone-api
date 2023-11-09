@@ -39,6 +39,7 @@ export const channelMessagesPipeline = (userId: ObjectId, contextId: ObjectId): 
 		// Could unwind the users
 		{
 			$project: {
+				_id: 0,
 				id: '$_id',
 				isOwner: { $eq: ['$userId', userId] },
 				userId: { $arrayElemAt: ['$user._id', 0] },

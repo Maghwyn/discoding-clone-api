@@ -1,8 +1,9 @@
-import { ObjectId } from 'mongodb';
+import { Filter, ObjectId } from 'mongodb';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
 import { ServiceError } from '@/common/error/catch.service';
 import { ConversationsRepository } from '@/routes/conversations/conversations.repository';
+import { Conversation } from '@/routes/conversations/interfaces/conversations.interface';
 
 @Injectable()
 export class ConversationsService {
@@ -10,6 +11,14 @@ export class ConversationsService {
 		@Inject(forwardRef(() => ConversationsRepository))
 		private readonly conversationsRepository: ConversationsRepository,
 	) {}
+	
+	createConversation(conversation: Conversation) {
+		return this.conversationsRepository.create(conversation);
+	}
+
+	retrieveFrom(filter: Filter<Conversation>) {
+		return this.conversationsRepository.findOne(filter);
+	}
 
 	// Create your own business logic here
 	// If the function is async but does not await something, we don't add the modifier async to the function

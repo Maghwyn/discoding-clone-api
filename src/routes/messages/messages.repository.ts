@@ -1,4 +1,4 @@
-import { Filter, UpdateFilter, Db, InsertOneOptions, DeleteOptions, FindOptions } from 'mongodb';
+import { Filter, UpdateFilter, Db, InsertOneOptions, DeleteOptions, FindOptions, Document } from 'mongodb';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { Message } from '@/routes/messages/interfaces/messages.interface';
@@ -23,8 +23,16 @@ export class MessagesRepository {
 		return this.messages.findOneAndUpdate(filter, update);
 	}
 
+	findMany(filter: Filter<Message>, options?: FindOptions<Document>) {
+		return this.messages.find(filter, options).toArray();
+	}
+
 	deleteOne(filter: Filter<Message>, options?: DeleteOptions) {
 		return this.messages.deleteMany(filter, options);
+	}
+
+	aggregate(pipeline: Document[]) {
+		return this.messages.aggregate(pipeline).toArray();
 	}
 
 	async exists(query: Filter<Message>) {

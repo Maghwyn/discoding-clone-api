@@ -9,6 +9,7 @@ import { convertToObjectId } from '@/common/helpers/string.helper';
 import { Conversation } from '@/routes/conversations/interfaces/conversations.interface';
 import { RelationshipsService } from '@/routes/relationship/relationship.service';
 import { RelationshipType } from '@/routes/relationship/interfaces/relationship.interface';
+import { channelMessagesPipeline } from '@/routes/messages/utils/messages.pipeline';
 
 @Injectable()
 export class MessagesService {
@@ -96,6 +97,29 @@ export class MessagesService {
 			// TODO: Dispatch socket from interlocutorId
 			// TODO: Dispatch socket from userId
 		}
+	}
+
+	async retrieveChannelMessages(userId: ObjectId, channelStrId: string, contextType: MessageContext) {
+		if (contextType !== MessageContext.CONVERSATION && contextType !== MessageContext.CHANNEL) {
+			throw new ServiceError('BAD_REQUEST', 'Context must either be 1 or 2');
+		}
+
+		const channelId = convertToObjectId(channelStrId);
+		
+		if (contextType === MessageContext.CONVERSATION) {
+			const channel = await this.conversationsService.retrieveFrom({ _id: channelId });
+			if (!channel) throw new ServiceError('NOT_FOUND', 'Channel not found');
+			if (!channel.userIdA.equals(userId) && !channel.userIdB.equals(userId)) {
+				throw new ServiceError('NOT_FOUND', 'Channel not found');
+			}
+		}
+
+		if (contextType === MessageContext.CHANNEL) {
+			// TODO: Retrieve from servers and verify the access to the channel
+			return [];
+		}
+
+		return this.messagesRepository.aggregate(channelMessagesPipeline(userId, channelId));
 	}
 
 	// Create your own business logic here

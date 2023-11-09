@@ -1,12 +1,13 @@
 import { ObjectId } from 'mongodb';
 import { Response } from 'express';
-import { Body, Controller, Delete, Param, Patch, Post, Res, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Res, UseFilters, UseGuards } from '@nestjs/common';
 
 import { Jwt } from '@/common/decorators/jwt.decorator';
 import { JwtAuthGuard } from '@/common/guards/jwt.guard';
 import { ServiceErrorCatcher } from '@/common/error/catch.service';
 import { MessagesService } from '@/routes/messages/messages.service';
-import { DTOSendPrivateMessage, DTOEditMessage } from '@/routes/messages/dto/messages.dto';
+import { DTOSendPrivateMessage, DTOEditMessage, DTOMessageContext } from '@/routes/messages/dto/messages.dto';
+import { MessageContext } from './interfaces/messages.interface';
 
 @Controller('messages')
 @UseGuards(JwtAuthGuard)
@@ -30,6 +31,12 @@ export class MessagesController {
 	async editMessage(@Jwt() userId: ObjectId, @Param('id') messageId: string, @Body() body: DTOEditMessage, @Res() res: Response) {
 		await this.messagesService.editMessage(userId, messageId, body.content);
 		return res.status(200).json();
+	}
+
+	@Get('/channel/:id')
+	async retrieveMessageFromChannel(@Jwt() userId: ObjectId, @Param('id') channelId: string, @Query('context') context: string, @Res() res: Response) {
+		const messages = await this.messagesService.retrieveChannelMessages(userId, channelId, parseInt(context));
+		return res.status(200).json(messages);
 	}
 
 	// Create your own controller routes

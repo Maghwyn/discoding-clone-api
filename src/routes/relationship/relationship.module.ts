@@ -9,5 +9,6 @@ import { RelationshipsRepository } from '@/routes/relationship/relationship.repo
 	imports: [DatabaseModule.forRoot()],
 	providers: [RelationshipsService, RelationshipsRepository],
 	controllers: [RelationshipsController],
+	exports: [RelationshipsService]
 })
 export class RelationshipsModule {}

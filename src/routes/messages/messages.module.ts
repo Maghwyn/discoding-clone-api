@@ -4,9 +4,11 @@ import { DatabaseModule } from '@/database/database.module';
 import { MessagesService } from '@/routes/messages/messages.service';
 import { MessagesController } from '@/routes/messages/messages.controller';
 import { MessagesRepository } from '@/routes/messages/messages.repository';
+import { ConversationsModule } from '@/routes/conversations/conversations.module';
+import { RelationshipsModule } from '@/routes/relationship/relationship.module';
 
 @Module({
-	imports: [DatabaseModule.forRoot()],
+	imports: [DatabaseModule.forRoot(), ConversationsModule, RelationshipsModule],
 	providers: [MessagesService, MessagesRepository],
 	controllers: [MessagesController],
 })

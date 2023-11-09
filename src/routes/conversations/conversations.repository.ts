@@ -1,4 +1,4 @@
-import { Filter, UpdateFilter, Db, InsertOneOptions, DeleteOptions, FindOptions } from 'mongodb';
+import { Filter, UpdateFilter, Db, InsertOneOptions, DeleteOptions, FindOptions, Document } from 'mongodb';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { Conversation } from '@/routes/conversations/interfaces/conversations.interface';
@@ -27,6 +27,10 @@ export class ConversationsRepository {
 	// So it's not visible for userA for exameple, but visible for userB as he did not delete it
 	deleteOne(filter: Filter<Conversation>, options?: DeleteOptions) {
 		return this.conversations.deleteMany(filter, options);
+	}
+
+	aggregate(pipeline?: Document[]) {
+		return this.conversations.aggregate(pipeline).toArray();
 	}
 
 	async exists(query: Filter<Conversation>) {

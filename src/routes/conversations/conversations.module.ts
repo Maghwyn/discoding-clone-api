@@ -9,5 +9,6 @@ import { ConversationsRepository } from '@/routes/conversations/conversations.re
 	imports: [DatabaseModule.forRoot()],
 	providers: [ConversationsService, ConversationsRepository],
 	controllers: [ConversationsController],
+	exports: [ConversationsService]
 })
 export class ConversationsModule {}

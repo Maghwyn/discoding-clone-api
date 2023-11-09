@@ -11,5 +11,6 @@ import { UsersRepository } from "@/routes/users/users.repository";
 	imports: [DatabaseModule.forRoot()],
 	providers: [RelationshipsService, RelationshipsRepository, UsersService, UsersRepository],
 	controllers: [RelationshipsController],
+	exports: [RelationshipsService]
 })
 export class RelationshipsModule {}

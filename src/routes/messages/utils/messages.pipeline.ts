@@ -36,10 +36,12 @@ export const channelMessagesPipeline = (userId: ObjectId, contextId: ObjectId): 
 				as: 'blockedRelationships',
 			},
 		},
+		// Could unwind the users
 		{
 			$project: {
 				id: '$_id',
 				isOwner: { $eq: ['$userId', userId] },
+				userId: { $arrayElemAt: ['$user._id', 0] },
 				userPicture: { $arrayElemAt: ['$user.avatarUrl', 0] },
 				username: { $arrayElemAt: ['$user.username', 0] },
 				content: '$content',

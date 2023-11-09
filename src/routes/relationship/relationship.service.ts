@@ -3,13 +3,55 @@ import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
 import { ServiceError } from '@/common/error/catch.service';
 import { RelationshipsRepository } from '@/routes/relationship/relationship.repository';
+import { RelationshipType } from "@/routes/relationship/interfaces/relationship.interface";
+import { UsersService } from "@/routes/users/users.service";
 
 @Injectable()
 export class RelationshipsService {
 	constructor(
 		@Inject(forwardRef(() => RelationshipsRepository))
 		private readonly relationshipsRepository: RelationshipsRepository,
+		private readonly  usersService: UsersService
 	) {}
+
+	async addFriend(userId: ObjectId, friendUsername: { username : string }) {
+
+		try {
+			let friendUserInfo = await this.usersService.getUserFrom({ username: friendUsername.username });
+
+			// check if the user exist
+			if (friendUserInfo == null) {
+				return "User does not exist"
+			}
+
+			// check if he is not asking himself
+			let userIdB = friendUserInfo._id;
+
+			if (userId.equals(userIdB)) {
+				return "You can't be friend with yourself"
+			}
+
+			// check if the user is already friend with him
+			let userB = await this.relationshipsRepository.findOne({ userIdB: userIdB });
+
+			if (userB !== null) {
+				return "You are already friend with this person"
+			}
+
+			let relationshipObject = {
+				type: RelationshipType.FRIEND,
+				userIdA: userId,
+				userIdB: userIdB,
+				since: new Date()
+			};
+
+			 this.relationshipsRepository.create(relationshipObject)
+
+			return "friend added"
+		} catch (error) {
+			console.error("Error:", error);
+		}
+	}
 
 	// Create your own business logic here
 	// If the function is async but does not await something, we don't add the modifier async to the function

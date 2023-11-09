@@ -2,6 +2,7 @@ import { Filter, UpdateFilter, Db, InsertOneOptions, DeleteOptions, FindOptions 
 import { Inject, Injectable } from '@nestjs/common';
 
 import { Channel } from '@/routes/channels/interfaces/channels.interface';
+import { Server } from "@/routes/servers/interfaces/servers.interface";
 
 @Injectable()
 export class ChannelsRepository {
@@ -13,6 +14,10 @@ export class ChannelsRepository {
 
 	create(doc: Channel, options?: InsertOneOptions) {
 		return this.channels.insertOne(doc, options);
+	}
+
+	findChannels(filter? : Filter<Channel>){
+		return this.channels.find(filter).toArray();
 	}
 
 	findOne(filter: Filter<Channel>, options?: FindOptions<Document>) {

@@ -32,18 +32,20 @@ export class RelationshipsService {
 
 		const relationship = await this.relationshipsRepository.findOne({
 			$or: [
-				{ userIdA: userId },
-				{ userIdB: userId }
+				{ userIdA: userId, userIdB: user._id },
+				{ userIdB: userId, userIdA: user._id }
 			]
 		});
 
 		if (relationship && relationship.type === RelationshipType.BLOCKED) {
 			return await this.deleteRelation(relationship._id);
+			// TODO: Need live sync
 		}
 
 		if (relationship && relationship.type === RelationshipType.FRIEND)
 			throw new ServiceError('BAD_REQUEST', 'You are already friend with this person');
 
+		// TODO: Need live sync
 		await this.relationshipsRepository.create({
 			userIdA: userId,
 			userIdB: user._id,

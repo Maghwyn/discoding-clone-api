@@ -1,8 +1,7 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsString, Length } from "class-validator";
-import { MessageContext, MessageType } from "../interfaces/messages.interface";
+import { MessageContext } from "@/routes/messages/interfaces/messages.interface";
 
-
-export class DTOSendPrivateMessage {
+export class DTOContextContentMessage {
 	@IsNotEmpty()
 	@IsString()
 	@Length(24, 24)
@@ -14,14 +13,14 @@ export class DTOSendPrivateMessage {
 	public content: string;
 }
 
-export class DTOEditMessage {
+export class DTOContextMessage {
 	@IsNotEmpty()
 	@IsString()
-	@Length(1, 1000)
-	public content: string;
+	@Length(24, 24)
+	public contextId: string;
 }
 
-export class DTOMessageContext {
+export class DTOContextTypeMessage {
 	@IsNotEmpty()
 	@IsNumber()
 	@IsEnum(MessageContext)

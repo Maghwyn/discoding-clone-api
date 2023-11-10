@@ -1,18 +1,39 @@
 import { ObjectId } from 'mongodb';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
-import { ServiceError } from '@/common/error/catch.service';
 import { ChannelsRepository } from '@/routes/channels/channels.repository';
 import { ServersService } from '@/routes/servers/servers.service';
-import { DTOchannelCreate, DTOChannelUpdate } from "@/routes/channels/dto/channels.dto";
+import { UsersService } from '@/routes/users/users.service';
+import { RelationshipsService } from '@/routes/relationship/relationship.service';
+import { ServersRepository } from '@/routes/servers/servers.repository';
+import { ConversationsService } from '@/routes/conversations/conversations.service';
+import { ChannelType } from '@/routes/channels/interfaces/channels.interface';
+import { DTOchannelCreate, DTOChannelUpdate } from '@/routes/channels/dto/channels.dto';
+
+interface ChannelsList {
+	serverId: ObjectId;
+	channelId: ObjectId;
+	channelName: string;
+	channelType: ChannelType;
+}
+
+interface MembersList {
+	conversationId: ObjectId;
+	username: string;
+	avatarUrl: string;
+}
 
 @Injectable()
 export class ChannelsService {
 	constructor(
 		@Inject(forwardRef(() => ServersService))
 		private readonly serversService: ServersService,
+		private readonly serverRepo: ServersRepository,
 		@Inject(forwardRef(() => ChannelsRepository))
 		private readonly channelsRepository: ChannelsRepository,
+		private readonly usersService: UsersService,
+		private readonly relationshipsService: RelationshipsService,
+		private readonly conversationsService: ConversationsService,
 	) {}
 
 	public createChannel(Channel: DTOchannelCreate, isDefault : boolean) {
@@ -25,11 +46,13 @@ export class ChannelsService {
 			serverId: new ObjectId(Channel.serverId)
 		}).then(res => {return res.insertedId});
 	}
+  
+	getChannels(serverId: string) {
+		return this.channelsRepository.findChannels({ serverId: new ObjectId(serverId) });
+	}
+
 	getOneChannel(channelId : ObjectId){
 		return this.channelsRepository.findOne({_id: channelId})
-	}
-	getChannels(serverId : string) {
-		return this.channelsRepository.findChannels({ serverId: new ObjectId(serverId) });
 	}
 
 	deleteChannels(channelId: string) {
@@ -37,21 +60,125 @@ export class ChannelsService {
 	}
 
 	updateChannel(channel: DTOChannelUpdate) {
-		return this.channelsRepository.findOneAndUpdate({
-			_id: new ObjectId(channel._id),
-		}, {
-			$set: {
-				name: channel.name,
+		return this.channelsRepository.findOneAndUpdate(
+			{
+				_id: new ObjectId(channel._id),
+			},
+			{
+				$set: {
+					name: channel.name,
+				},
+			},
+		);
+	}
+	async searchChannelsAndUsers(userId, searchElement) {
+		// get all channels from server
+		const allChannels: ChannelsList[] = [];
+		const allMembers: MembersList[] = [];
+
+		const conversationFilter = {
+			$or: [{ userIdA: userId }, { userIdB: userId }],
+		};
+
+		const conversations = await this.conversationsService
+			.retrieveManyFrom(conversationFilter)
+			.toArray();
+
+		conversations.map(async (conv) => {
+			if (userId.equals(conv.userIdA)) {
+				const otherUserInfo = await this.usersService.getUserFrom(conv.userIdB);
+				allMembers.push({
+					conversationId: otherUserInfo?._id,
+					username: otherUserInfo.username,
+					avatarUrl: otherUserInfo?.avatarUrl,
+				});
+			} else {
+				const otherUserInfo = await this.usersService.getUserFrom(conv.userIdA);
+				allMembers.push({
+					conversationId: otherUserInfo?._id,
+					username: otherUserInfo.username,
+					avatarUrl: otherUserInfo?.avatarUrl,
+				});
 			}
 		});
+
+		// look for server where the user is in
+		const usersServer = await this.serversService.getUserServer(userId);
+		if (usersServer !== null) {
+			usersServer.map(async (server) => {
+				const channelsFromServer = await this.channelsRepository
+					.find({
+						serverId: server._id,
+					})
+					.toArray();
+
+				channelsFromServer.map((channelFromServer) => {
+					allChannels.push({
+						serverId: channelFromServer.serverId,
+						channelId: channelFromServer._id,
+						channelName: channelFromServer.name,
+						channelType: channelFromServer.type,
+					});
+				});
+
+				server.members.map(async (member) => {
+					const memberInfo = await this.usersService.getUserFrom(member);
+
+					// handle if user is member in another serve
+					if (!memberInfo._id.equals(userId)) {
+						let isMemberAlreadyThere = false;
+						allMembers.map((member) => {
+							if (member.username == memberInfo.username) {
+								isMemberAlreadyThere = true;
+							}
+						});
+
+						if (!isMemberAlreadyThere) {
+							allMembers.push({
+								conversationId: null,
+								username: memberInfo.username,
+								avatarUrl: memberInfo?.avatarUrl,
+							});
+						}
+					}
+				});
+			});
+		}
+
+		// Get userFriends
+		const userFriends = await this.relationshipsService
+			.retrieveManyFrom({
+				$or: [{ userIdA: userId }, { userIdB: userId }],
+				type: 1,
+			})
+			.toArray();
+
+		let isMemberAlreadyThere = false;
+		const promise = userFriends.map(async (userFriend) => {
+			let userFriendInfo;
+			if (userId.equals(userFriend.userIdA)) {
+				userFriendInfo = await this.usersService.getUserFrom({ _id: userFriend.userIdB });
+			} else {
+				userFriendInfo = await this.usersService.getUserFrom({ _id: userFriend.userIdA });
+			}
+
+			allMembers.map((member) => {
+				if (member.username == userFriendInfo.username) {
+					isMemberAlreadyThere = true;
+				}
+			});
+
+			if (!isMemberAlreadyThere) {
+				allMembers.push({
+					conversationId: undefined,
+					username: userFriendInfo.username,
+					avatarUrl: userFriendInfo?.avatarUrl,
+				});
+			}
+		});
+
+		await Promise.all(promise);
+
+		return [allChannels, allMembers];
 	}
-	// Create your own business logic here
-	// If the function is async but does not await something, we don't add the modifier async to the function
-	// Just keep that in mind
-
-	// If you wanna throw an error manually after a condition, use new ServiceError(type, message);
-	// Mongodb return null if it doesn't find the document, so you can do (!document) throw new ServiceError(type, message);
-
-	// If you need a document from another repository in another module, you use the service of that module to get it throught a function.
-	// You do not import directly the repository of another module.
 }

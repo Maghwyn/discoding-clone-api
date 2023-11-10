@@ -5,13 +5,46 @@ import { ServiceError } from '@/common/error/catch.service';
 import { ConversationsRepository } from '@/routes/conversations/conversations.repository';
 import { Conversation } from '@/routes/conversations/interfaces/conversations.interface';
 import { directMessagesPipeline } from '@/routes/conversations/utils/conversations.pipeline';
+import { UsersService } from '@/routes/users/users.service';
+import { convertToObjectId } from '@/common/helpers/string.helper';
 
 @Injectable()
 export class ConversationsService {
 	constructor(
 		@Inject(forwardRef(() => ConversationsRepository))
 		private readonly conversationsRepository: ConversationsRepository,
+		@Inject(forwardRef(() => UsersService))
+		private readonly usersService: UsersService,
 	) {}
+
+	// Means that there's no message
+	async createEmptyConversation(userId: ObjectId, interlocutorStrId: string) {
+		const interlocutorId = convertToObjectId(interlocutorStrId);
+		const user = await this.usersService.getUserFrom({ _id: interlocutorId });
+		if (!user) throw new ServiceError('NOT_FOUND', 'User not found');
+
+		const conv = this.retrieveFrom({
+			$or: [
+				{ userIdA: userId, userIdB: interlocutorId },
+				{ userIdA: interlocutorId, userIdB: user }
+			]
+		})
+		if (conv) throw new ServiceError('BAD_REQUEST', 'Channel already exist')
+		
+		const res = await this.createConversation({
+			userIdA: userId,
+			userIdB: interlocutorId,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+
+		return {
+			id: res.insertedId,
+			userId: user._id,
+			pictureUrl: user.avatarUrl,
+			username: user.username,
+		}
+	}
 	
 	createConversation(conversation: Conversation) {
 		return this.conversationsRepository.create(conversation);
@@ -19,6 +52,10 @@ export class ConversationsService {
 
 	retrieveFrom(filter: Filter<Conversation>) {
 		return this.conversationsRepository.findOne(filter);
+	}
+
+	retrieveManyFrom(filter: Filter<Conversation>) {
+		return this.conversationsRepository.find(filter);
 	}
 
 	retrieveMyConversations(userId: ObjectId) {

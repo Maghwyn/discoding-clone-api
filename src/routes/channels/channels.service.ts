@@ -1,7 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
-import { ServiceError } from '@/common/error/catch.service';
 import { ChannelsRepository } from '@/routes/channels/channels.repository';
 import { ServersService } from '@/routes/servers/servers.service';
 import { UsersService } from '@/routes/users/users.service';
@@ -9,7 +8,7 @@ import { RelationshipsService } from '@/routes/relationship/relationship.service
 import { ServersRepository } from '@/routes/servers/servers.repository';
 import { ConversationsService } from '@/routes/conversations/conversations.service';
 import { ChannelType } from '@/routes/channels/interfaces/channels.interface';
-import { DTOchannelCreate, DTOChannelUpdate } from "@/routes/channels/dto/channels.dto";
+import { DTOchannelCreate, DTOChannelUpdate } from '@/routes/channels/dto/channels.dto';
 
 interface ChannelsList {
 	serverId: ObjectId;
@@ -44,7 +43,7 @@ export class ChannelsService {
 			createdAt: new Date(),
 			type: Channel.type,
 			isDefault: false,
-			serverId: new ObjectId(Channel.serverId)
+			serverId: new ObjectId(Channel.serverId),
 		});
 	}
 
@@ -60,30 +59,21 @@ export class ChannelsService {
 	}
 
 	updateChannel(channel: DTOChannelUpdate) {
-		return this.channelsRepository.findOneAndUpdate({
-			_id: new ObjectId(channel._id),
-		}, {
-			$set: {
-				name: channel.name,
-			}
-		});
+		return this.channelsRepository.findOneAndUpdate(
+			{
+				_id: new ObjectId(channel._id),
+			},
+			{
+				$set: {
+					name: channel.name,
+				},
+			},
+		);
 	}
-	// Create your own business logic here
-	// If the function is async but does not await something, we don't add the modifier async to the function
-	// Just keep that in mind
 	async searchChannelsAndUsers(userId, searchElement) {
-
-
-		// look for server where the user is in
-
 		// get all channels from server
 		const allChannels: ChannelsList[] = [];
 		const allMembers: MembersList[] = [];
-		/*
-				const conversations = await this.conversationsService.retrieveMyConversations(
-					userId,
-				);
-		*/
 
 		const conversationFilter = {
 			$or: [{ userIdA: userId }, { userIdB: userId }],
@@ -111,6 +101,7 @@ export class ChannelsService {
 			}
 		});
 
+		// look for server where the user is in
 		const usersServer = await this.serversService.getUserServer(userId);
 		if (usersServer !== null) {
 			usersServer.map(async (server) => {
@@ -152,8 +143,6 @@ export class ChannelsService {
 				});
 			});
 		}
-
-		const userInfo = await this.usersService.getUserFrom({ _id: userId });
 
 		// Get userFriends
 		const userFriends = await this.relationshipsService

@@ -36,22 +36,23 @@ export class ChannelsService {
 		private readonly conversationsService: ConversationsService,
 	) {}
 
-	public createChannel(Channel: DTOchannelCreate) {
+	public createChannel(Channel: DTOchannelCreate, isDefault : boolean) {
 		return this.channelsRepository.create({
 			name: Channel.name,
 			_id: new ObjectId(),
 			createdAt: new Date(),
 			type: Channel.type,
-			isDefault: false,
-			serverId: new ObjectId(Channel.serverId),
-		});
+			isDefault: isDefault,
+			serverId: new ObjectId(Channel.serverId)
+		}).then(res => {return res.insertedId});
+	}
+  
+	getChannels(serverId: string) {
+		return this.channelsRepository.findChannels({ serverId: new ObjectId(serverId) });
 	}
 
-	getChannels(serverId: string) {
-		console.log('3333333');
-		console.log(serverId);
-		console.log('3333333');
-		return this.channelsRepository.findChannels({ serverId: new ObjectId(serverId) });
+	getOneChannel(channelId : ObjectId){
+		return this.channelsRepository.findOne({_id: channelId})
 	}
 
 	deleteChannels(channelId: string) {

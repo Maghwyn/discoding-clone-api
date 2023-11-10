@@ -29,6 +29,6 @@ import { ConversationsService } from "@/routes/conversations/conversations.servi
 		ConversationsService,
 	],
 	controllers: [ChannelsController],
-	exports: [ChannelsService]
+	exports: [ChannelsService, ChannelsRepository]
 })
 export class ChannelsModule {}

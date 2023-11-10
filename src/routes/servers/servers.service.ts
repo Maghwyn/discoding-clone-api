@@ -5,12 +5,16 @@ import { ServiceError } from "@/common/error/catch.service";
 import { ServersRepository } from "@/routes/servers/servers.repository";
 import { Server, Config, Role } from "@/routes/servers/interfaces/servers.interface";
 import { DTOserverCreate, DTOserverUpdate } from "@/routes/servers/dto/server.dto";
+import { ChannelsRepository } from "@/routes/channels/channels.repository";
 
 @Injectable()
 export class ServersService {
   constructor(
     @Inject(forwardRef(() => ServersRepository))
-    private readonly serversRepository: ServersRepository
+    private readonly serversRepository: ServersRepository,
+
+    @Inject(forwardRef(() => ChannelsRepository))
+    private readonly channelsRepository: ChannelsRepository
   ) {
   }
 
@@ -18,8 +22,20 @@ export class ServersService {
     return this.serversRepository.findServers();
   }
 
-  getUserServer(userId: ObjectId) {
-    return this.serversRepository.findServers({ $or: [{ members: { $in: [userId] } }, { ownerId: userId }] });
+  async getOneServer(serverId : ObjectId) {
+    const serv = await this.serversRepository.findOne({_id: serverId});
+    const defaultChan = await this.channelsRepository.findOne({serverId : serv._id, isDefault: true});
+    serv.lastChannelId = defaultChan._id
+    return serv
+  }
+
+  async getUserServer(userId: ObjectId) {
+    const servers = await this.serversRepository.findServers({ $or: [{ members: { $in: [userId] } }, { ownerId: userId }] });
+    for ( const server of servers ) {
+      const channel = await this.channelsRepository.findOne({serverId : server._id, isDefault: true});
+      server.lastChannelId = channel._id;
+    }
+    return servers
   }
 
   createServer(serverDTO: DTOserverCreate, userId: ObjectId) {
@@ -38,7 +54,9 @@ export class ServersService {
       isPublic: serverDTO.isPublic,
       _id: new ObjectId(),
       members: [],
-      config: config
+      config: config,
+      lastChannelId: null,
+      notificationCount: 0
     });
   }
 

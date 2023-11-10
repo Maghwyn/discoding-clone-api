@@ -10,6 +10,8 @@ export interface Server {
 	isPublic: boolean;
 	createdAt: Date;
 	members: Array<ObjectId>;
+	lastChannelId: ObjectId;
+	notificationCount: number;
 }
 
 export interface Config {

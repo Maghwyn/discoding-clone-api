@@ -19,7 +19,50 @@ export class RelationshipsService {
 	retrieveFrom(filter: Filter<Relationship>) {
 		return this.relationshipsRepository.findOne(filter);
 	}
+    
+    retrieveManyFrom(filter: Filter<Relationship>) {
+		return this.relationshipsRepository.find(filter);
+	}
 
+    async addFriend(userId: ObjectId, friendUsername: { username: string }) {
+		try {
+			const friendUserInfo = await this.usersService.getUserFrom({
+				username: friendUsername.username,
+			});
+
+			// check if the user exist
+			if (friendUserInfo == null) {
+				return 'User does not exist';
+			}
+
+			// check if he is not asking himself
+			const userIdB = friendUserInfo._id;
+
+			if (userId.equals(userIdB)) {
+				return "You can't be friend with yourself";
+			}
+
+			// check if the user is already friend with him
+			const userB = await this.relationshipsRepository.findOne({ userIdB: userIdB });
+
+			if (userB !== null) {
+				return 'You are already friend with this person';
+			}
+
+			const relationshipObject = {
+				type: RelationshipType.FRIEND,
+				userIdA: userId,
+				userIdB: userIdB,
+				since: new Date(),
+			};
+
+			this.relationshipsRepository.create(relationshipObject);
+
+			return 'friend added';
+		} catch (error) {
+			console.error('Error:', error);
+		}
+	}
 	async createRelation(userId: ObjectId, username: string, type: RelationshipType) {
 		const user = await this.usersService.getUserFrom({ username });
 		if (!user) throw new ServiceError('NOT_FOUND', 'User not found');
@@ -29,6 +72,7 @@ export class RelationshipsService {
 				: 'You can\'t block yourself'
 			throw new ServiceError('BAD_REQUEST', text);
 		}
+
 
 		const relationship = await this.relationshipsRepository.findOne({
 			$or: [

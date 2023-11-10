@@ -38,8 +38,9 @@ export class ServersController {
 	@Post()
 	async createServer(@Jwt() userId: ObjectId, @Body() server : DTOserverCreate, @Res() res: Response) {
 		const servers = await this.serversService.createServer(server, userId);
-		const channel = await this.channelServices.createChannel({ name : 'Welcome', serverId : servers.toString(), type: "text" })
-		return res.status(201).json("success");
+		const channel = await this.channelServices.createChannel({ name : 'Welcome', serverId : servers.toString(), type: "text" }, true)
+		const serv = await this.serversService.getOneServer(servers);
+		return res.status(201).json(serv);
 	}
 
 	@Delete(':id')

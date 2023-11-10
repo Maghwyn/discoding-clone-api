@@ -15,17 +15,19 @@ export class ChannelsService {
 		private readonly channelsRepository: ChannelsRepository,
 	) {}
 
-	public createChannel(Channel: DTOchannelCreate) {
+	public createChannel(Channel: DTOchannelCreate, isDefault : boolean) {
 		return this.channelsRepository.create({
 			name: Channel.name,
 			_id: new ObjectId(),
 			createdAt: new Date(),
 			type: Channel.type,
-			isDefault: false,
+			isDefault: isDefault,
 			serverId: new ObjectId(Channel.serverId)
-		});
+		}).then(res => {return res.insertedId});
 	}
-
+	getOneChannel(channelId : ObjectId){
+		return this.channelsRepository.findOne({_id: channelId})
+	}
 	getChannels(serverId : string) {
 		return this.channelsRepository.findChannels({ serverId: new ObjectId(serverId) });
 	}

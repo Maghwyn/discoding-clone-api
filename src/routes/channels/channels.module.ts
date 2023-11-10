@@ -11,6 +11,6 @@ import { ServersRepository } from "@/routes/servers/servers.repository";
 	imports: [DatabaseModule.forRoot(), forwardRef(() => ServersModule)],
 	providers: [ChannelsService, ChannelsRepository],
 	controllers: [ChannelsController],
-	exports: [ChannelsService]
+	exports: [ChannelsService, ChannelsRepository]
 })
 export class ChannelsModule {}

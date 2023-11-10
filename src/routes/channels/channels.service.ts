@@ -88,14 +88,14 @@ export class ChannelsService {
 			if (userId.equals(conv.userIdA)) {
 				const otherUserInfo = await this.usersService.getUserFrom(conv.userIdB);
 				allMembers.push({
-					conversationId: otherUserInfo?._id,
+					conversationId: conv?._id,
 					username: otherUserInfo.username,
 					avatarUrl: otherUserInfo?.avatarUrl,
 				});
 			} else {
 				const otherUserInfo = await this.usersService.getUserFrom(conv.userIdA);
 				allMembers.push({
-					conversationId: otherUserInfo?._id,
+					conversationId: conv?._id,
 					username: otherUserInfo.username,
 					avatarUrl: otherUserInfo?.avatarUrl,
 				});
@@ -135,7 +135,7 @@ export class ChannelsService {
 
 						if (!isMemberAlreadyThere) {
 							allMembers.push({
-								conversationId: null,
+								conversationId: undefined,
 								username: memberInfo.username,
 								avatarUrl: memberInfo?.avatarUrl,
 							});

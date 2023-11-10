@@ -37,27 +37,7 @@ export class ChannelsService {
 	) {}
 
 	async searchChannelsAndUsers(userId, searchElement) {
-		/*		this.conversationsService.createConversation({
-			userIdA: new ObjectId("654e04d27bca578cad0f6d7c"),
-			userIdB: new ObjectId("654e04e67bca578cad0f6d7e"),
-			createdAt: new Date(),
-			updatedAt: new Date()
-		})*/
 
-		/*this.serverRepo.findOneAndUpdate(
-					{ _id: new ObjectId('654cee2be46e639d76e38e48') },
-					{ $set :{ members: [new ObjectId('654c15e572586e225f6d355b')] } },
-				);*/
-
-		/*		this.channelsRepository.create(
-			{
-				serverId: new ObjectId("654cef63e46e639d76e38e4a"),
-				isDefault: true,
-				name: "Mohamed",
-				type: "text",
-				createdAt: new Date()
-			}
-		)*/
 
 		// look for server where the user is in
 

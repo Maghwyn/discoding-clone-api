@@ -39,6 +39,12 @@ export class MessagesController {
 		return res.status(200).json();
 	}
 
+	@Get('/search/:channelId')
+	async searchMessageInChannel(@Jwt() userId: ObjectId, @Param('channelId') channelId: string, @Query('q') query: string, @Res() res: Response) {
+		const messages = await this.messagesService.searchMessageInChannel(userId, channelId, query);
+		return res.status(200).json(messages);
+	}
+
 	@Get('/channel/:id')
 	async retrieveMessageFromChannel(@Jwt() userId: ObjectId, @Param('id') channelId: string, @Query('context') context: string, @Res() res: Response) {
 		const messages = await this.messagesService.retrieveChannelMessages(userId, channelId, parseInt(context));

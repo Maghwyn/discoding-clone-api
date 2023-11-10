@@ -128,3 +128,38 @@ export const privateUnreadMessagesPipeline = (userId: ObjectId): Document[] => {
 		},
 	]
 }
+
+export const searchMessagePipeline = (userId: ObjectId, contextId: ObjectId, query: string): Document[] => {
+	return [
+		{
+			$match: {
+				contextId: contextId,
+				content: new RegExp(query, 'gi')
+			},
+		},
+		{
+			$lookup: {
+				from: 'users',
+				localField: 'userId',
+				foreignField: '_id',
+				as: 'user',
+			},
+		},
+		{
+			$project: {
+				_id: 0,
+				id: '$_id',
+				isOwner: { $eq: ['$userId', userId] },
+				userId: { $arrayElemAt: ['$user._id', 0] },
+				userPicture: { $arrayElemAt: ['$user.avatarUrl', 0] },
+				username: { $arrayElemAt: ['$user.username', 0] },
+				channelId: '$contextId',
+				content: '$content',
+				isEdited: '$isEdited',
+				isBlocked: { $eq: [true, false] },
+				createdAt: '$createdAt',
+			},
+		},
+	]
+}
+

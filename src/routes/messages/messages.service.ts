@@ -9,7 +9,7 @@ import { convertToObjectId } from '@/common/helpers/string.helper';
 import { Conversation } from '@/routes/conversations/interfaces/conversations.interface';
 import { RelationshipsService } from '@/routes/relationship/relationship.service';
 import { RelationshipType } from '@/routes/relationship/interfaces/relationship.interface';
-import { channelMessagesPipeline, privateUnreadMessagesPipeline } from '@/routes/messages/utils/messages.pipeline';
+import { channelMessagesPipeline, privateUnreadMessagesPipeline, searchMessagePipeline } from '@/routes/messages/utils/messages.pipeline';
 import { UsersService } from '@/routes/users/users.service';
 import { MessagesGateway } from '@/routes/messages/messages.gateway';
 
@@ -158,6 +158,14 @@ export class MessagesService {
 
 	async retrievePrivateUnreads(userId: ObjectId) {
 		return this.messagesRepository.aggregate(privateUnreadMessagesPipeline(userId));
+	}
+
+	async searchMessageInChannel(userId: ObjectId, channelStrId: string, query: string) {
+		const channelId = convertToObjectId(channelStrId);
+		const channel = this.conversationsService.retrieveFrom({ _id: channelId });
+		if (!channel) throw new ServiceError('NOT_FOUND', 'Channel not found');
+
+		return this.messagesRepository.aggregate(searchMessagePipeline(userId, channelId, query));
 	}
 
 	// Create your own business logic here

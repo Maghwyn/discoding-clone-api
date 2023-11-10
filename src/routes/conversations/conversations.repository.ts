@@ -19,6 +19,10 @@ export class ConversationsRepository {
 		return this.conversations.findOne(filter, options);
 	}
 
+	find(filter: Filter<Conversation>, options?: FindOptions<Document>) {
+		return this.conversations.find(filter, options);
+	}
+
 	findOneAndUpdate(filter: Filter<Conversation>, update: UpdateFilter<Conversation>) {
 		return this.conversations.findOneAndUpdate(filter, update);
 	}

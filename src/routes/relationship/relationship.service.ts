@@ -18,6 +18,10 @@ export class RelationshipsService {
 		return this.relationshipsRepository.findOne(filter);
   }
 
+	retrieveManyFrom(filter: Filter<Relationship>) {
+		return this.relationshipsRepository.find(filter);
+	}
+
 	async addFriend(userId: ObjectId, friendUsername: { username: string }) {
 		try {
 			const friendUserInfo = await this.usersService.getUserFrom({

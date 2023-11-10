@@ -15,6 +15,9 @@ export class ChannelsRepository {
 		return this.channels.insertOne(doc, options);
 	}
 
+	find(filter: Filter<Channel>, options?: FindOptions<Document>) {
+		return this.channels.find(filter, options);
+	}
 	findOne(filter: Filter<Channel>, options?: FindOptions<Document>) {
 		return this.channels.findOne(filter, options);
 	}

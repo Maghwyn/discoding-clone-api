@@ -21,6 +21,10 @@ export class ConversationsService {
 		return this.conversationsRepository.findOne(filter);
 	}
 
+	retrieveManyFrom(filter: Filter<Conversation>) {
+		return this.conversationsRepository.find(filter);
+	}
+
 	retrieveMyConversations(userId: ObjectId) {
 		return this.conversationsRepository.aggregate(directMessagesPipeline(userId));
 	}

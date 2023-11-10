@@ -19,6 +19,10 @@ export class RelationshipsRepository {
 		return this.relationships.findOne(filter, options);
 	}
 
+	find(filter: Filter<Relationship>, options?: FindOptions<Document>) {
+		return this.relationships.find(filter, options);
+	}
+
 	findOneAndUpdate(filter: Filter<Relationship>, update: UpdateFilter<Relationship>) {
 		return this.relationships.findOneAndUpdate(filter, update);
 	}

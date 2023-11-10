@@ -1,9 +1,11 @@
 import { Response } from 'express';
-import { Controller, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Res, UseFilters, UseGuards } from "@nestjs/common";
 
 import { JwtAuthGuard } from '@/common/guards/jwt.guard';
 import { ServiceErrorCatcher } from '@/common/error/catch.service';
 import { ChannelsService } from '@/routes/channels/channels.service';
+import { Jwt } from "@/common/decorators/jwt.decorator";
+import { ObjectId } from "mongodb";
 
 @Controller('channels')
 @UseGuards(JwtAuthGuard)
@@ -11,9 +13,17 @@ import { ChannelsService } from '@/routes/channels/channels.service';
 export class ChannelsController {
 	constructor(private readonly channelsService: ChannelsService) {}
 
-	// Create your own controller routes
-	// Available tag @Post() @Get() @Put() @Delete() @Patch()
+	@Get('searchChannelsAndUsers')
+	async searchChannelsAndUsers(
+		@Jwt() userId: ObjectId,
+		@Query() searchElement: { searchElement: string },
+		@Res() res: Response,
+	) {
+		const [channels, users] = await this.channelsService.searchChannelsAndUsers(
+			userId,
+			searchElement,
+		);
 
-	// ServiceErrorCatcher listen to error thrown by ServiceError and prevent the API from crashing from manual throw
-	// Response is imported because we use Reponse from Express, and not Response from node
+		return res.status(200).json({ channels: channels, users: users });
+	}
 }

@@ -33,7 +33,7 @@ export class ConversationsRepository {
 		return this.conversations.deleteMany(filter, options);
 	}
 
-	aggregate(pipeline?: Document[]) {
+	aggregate(pipeline: Document[]) {
 		return this.conversations.aggregate(pipeline).toArray();
 	}
 

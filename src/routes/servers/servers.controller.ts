@@ -8,12 +8,15 @@ import { Jwt } from "@/common/decorators/jwt.decorator";
 import { ObjectId } from "mongodb";
 
 import { DTOserverCreate, DTOserverUpdate } from "@/routes/servers/dto/server.dto";
+import { ChannelsService } from "@/routes/channels/channels.service";
 
 @Controller('servers')
 @UseGuards(JwtAuthGuard)
 @UseFilters(ServiceErrorCatcher)
 export class ServersController {
-	constructor(private readonly serversService: ServersService) {}
+	constructor(private readonly serversService: ServersService,
+	private readonly channelServices : ChannelsService
+	) {}
 
 	// Create your own controller routes
 	// Available tag @Post() @Get() @Put() @Delete() @Patch()
@@ -35,7 +38,8 @@ export class ServersController {
 	@Post()
 	async createServer(@Jwt() userId: ObjectId, @Body() server : DTOserverCreate, @Res() res: Response) {
 		const servers = await this.serversService.createServer(server, userId);
-		return res.status(201).json(servers);
+		const channel = await this.channelServices.createChannel({ name : 'Welcome', serverId : servers.toString(), type: "text" })
+		return res.status(201).json("success");
 	}
 
 	@Delete(':id')

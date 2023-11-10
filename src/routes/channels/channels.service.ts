@@ -9,6 +9,7 @@ import { RelationshipsService } from '@/routes/relationship/relationship.service
 import { ServersRepository } from '@/routes/servers/servers.repository';
 import { ConversationsService } from '@/routes/conversations/conversations.service';
 import { ChannelType } from '@/routes/channels/interfaces/channels.interface';
+import { DTOchannelCreate, DTOChannelUpdate } from "@/routes/channels/dto/channels.dto";
 
 interface ChannelsList {
 	serverId: ObjectId;
@@ -36,6 +37,40 @@ export class ChannelsService {
 		private readonly conversationsService: ConversationsService,
 	) {}
 
+	public createChannel(Channel: DTOchannelCreate) {
+		return this.channelsRepository.create({
+			name: Channel.name,
+			_id: new ObjectId(),
+			createdAt: new Date(),
+			type: Channel.type,
+			isDefault: false,
+			serverId: new ObjectId(Channel.serverId)
+		});
+	}
+
+	getChannels(serverId: string) {
+		console.log('3333333');
+		console.log(serverId);
+		console.log('3333333');
+		return this.channelsRepository.findChannels({ serverId: new ObjectId(serverId) });
+	}
+
+	deleteChannels(channelId: string) {
+		return this.channelsRepository.deleteOne({ _id: new ObjectId(channelId) });
+	}
+
+	updateChannel(channel: DTOChannelUpdate) {
+		return this.channelsRepository.findOneAndUpdate({
+			_id: new ObjectId(channel._id),
+		}, {
+			$set: {
+				name: channel.name,
+			}
+		});
+	}
+	// Create your own business logic here
+	// If the function is async but does not await something, we don't add the modifier async to the function
+	// Just keep that in mind
 	async searchChannelsAndUsers(userId, searchElement) {
 
 
@@ -101,9 +136,6 @@ export class ChannelsService {
 					if (!memberInfo._id.equals(userId)) {
 						let isMemberAlreadyThere = false;
 						allMembers.map((member) => {
-							console.log('333333333');
-							console.log(member.username, memberInfo.username);
-							console.log('333333333');
 							if (member.username == memberInfo.username) {
 								isMemberAlreadyThere = true;
 							}

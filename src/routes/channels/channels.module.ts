@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from "@nestjs/common";
 
 import { DatabaseModule } from '@/database/database.module';
 import { ChannelsService } from '@/routes/channels/channels.service';
@@ -15,7 +15,7 @@ import { ConversationsRepository } from "@/routes/conversations/conversations.re
 import { ConversationsService } from "@/routes/conversations/conversations.service";
 
 @Module({
-	imports: [DatabaseModule.forRoot(), ServersModule],
+	imports: [DatabaseModule.forRoot(), ServersModule, forwardRef(() => ServersModule)],
 	providers: [
 		ChannelsService,
 		ChannelsRepository,
@@ -29,5 +29,6 @@ import { ConversationsService } from "@/routes/conversations/conversations.servi
 		ConversationsService,
 	],
 	controllers: [ChannelsController],
+	exports: [ChannelsService]
 })
 export class ChannelsModule {}

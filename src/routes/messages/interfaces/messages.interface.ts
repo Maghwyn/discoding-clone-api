@@ -5,10 +5,33 @@ export interface Message {
 	contextId: ObjectId;
 	contextType: MessageContext; 
 	type: MessageType;
-	userId: ObjectId; // From the userId, you will need to aggregate to the users collection and retrieve useranme, avatarUrl ect.
+	userId: ObjectId;
 	content: string;
 	isEdited: boolean;
+	isRead: boolean;
 	createdAt: Date;
+}
+
+export interface MessageDetails {
+	id: ObjectId;
+	isOwner: boolean;
+	userId: ObjectId;
+	userPicture: string;
+	username: string;
+	content: string;
+	channelId: ObjectId;
+	isEdited: boolean;
+	isBlocked: boolean;
+	createdAt: Date;
+}
+
+export interface MessageUpdate {
+	id: ObjectId;
+	content: string;
+}
+
+export interface MessageDelete {
+	id: ObjectId;
 }
 
 export enum MessageContext {

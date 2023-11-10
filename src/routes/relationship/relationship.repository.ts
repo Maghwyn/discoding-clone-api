@@ -1,4 +1,4 @@
-import { Filter, UpdateFilter, Db, InsertOneOptions, DeleteOptions, FindOptions } from 'mongodb';
+import { Filter, UpdateFilter, Db, InsertOneOptions, DeleteOptions, FindOptions, Document } from 'mongodb';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { Relationship } from '@/routes/relationship/interfaces/relationship.interface';
@@ -29,6 +29,10 @@ export class RelationshipsRepository {
 
 	deleteOne(filter: Filter<Relationship>, options?: DeleteOptions) {
 		return this.relationships.deleteMany(filter, options);
+	}
+
+	aggregate(pipeline: Document[]) {
+		return this.relationships.aggregate(pipeline).toArray();
 	}
 
 	async exists(query: Filter<Relationship>) {

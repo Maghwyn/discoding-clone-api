@@ -5,6 +5,8 @@ import { RelationshipsRepository } from '@/routes/relationship/relationship.repo
 import { Relationship } from '@/routes/relationship/interfaces/relationship.interface';
 import { RelationshipType } from '@/routes/relationship/interfaces/relationship.interface';
 import { UsersService } from '@/routes/users/users.service';
+import { ServiceError } from '@/common/error/catch.service';
+import { relationshipListPipeline } from '@/routes/relationship/utils/relationship.pipeline';
 
 @Injectable()
 export class RelationshipsService {
@@ -16,13 +18,13 @@ export class RelationshipsService {
 
 	retrieveFrom(filter: Filter<Relationship>) {
 		return this.relationshipsRepository.findOne(filter);
-  }
-
-	retrieveManyFrom(filter: Filter<Relationship>) {
+	}
+    
+    retrieveManyFrom(filter: Filter<Relationship>) {
 		return this.relationshipsRepository.find(filter);
 	}
 
-	async addFriend(userId: ObjectId, friendUsername: { username: string }) {
+    async addFriend(userId: ObjectId, friendUsername: { username: string }) {
 		try {
 			const friendUserInfo = await this.usersService.getUserFrom({
 				username: friendUsername.username,
@@ -60,6 +62,51 @@ export class RelationshipsService {
 		} catch (error) {
 			console.error('Error:', error);
 		}
+	}
+	async createRelation(userId: ObjectId, username: string, type: RelationshipType) {
+		const user = await this.usersService.getUserFrom({ username });
+		if (!user) throw new ServiceError('NOT_FOUND', 'User not found');
+		if (user._id.equals(userId)) {
+			const text = type === RelationshipType.FRIEND
+				? 'You can\'t be friend with yourself'
+				: 'You can\'t block yourself'
+			throw new ServiceError('BAD_REQUEST', text);
+		}
+
+
+		const relationship = await this.relationshipsRepository.findOne({
+			$or: [
+				{ userIdA: userId, userIdB: user._id },
+				{ userIdB: userId, userIdA: user._id }
+			]
+		});
+
+		if (relationship && relationship.type === RelationshipType.BLOCKED) {
+			return await this.deleteRelation(relationship._id);
+			// TODO: Need live sync
+		}
+
+		if (relationship && relationship.type === RelationshipType.FRIEND)
+			throw new ServiceError('BAD_REQUEST', 'You are already friend with this person');
+
+		// TODO: Need live sync
+		await this.relationshipsRepository.create({
+			userIdA: userId,
+			userIdB: user._id,
+			type,
+			since: new Date(),
+		});
+	}
+
+	async deleteRelation(relationshipId: ObjectId) {
+		await this.relationshipsRepository.deleteOne({ _id: relationshipId });
+	}
+
+	async retrieveRelationList(userId: ObjectId, type: RelationshipType) {
+		if (type !== RelationshipType.PENDING && type !== RelationshipType.FRIEND && type !== RelationshipType.BLOCKED)
+			throw new ServiceError('BAD_REQUEST', 'Relation type must be one of 0,1,2');
+
+		return this.relationshipsRepository.aggregate(relationshipListPipeline(userId, type));
 	}
 
 	// Create your own business logic here

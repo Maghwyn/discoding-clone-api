@@ -35,6 +35,10 @@ export class MessagesRepository {
 		return this.messages.aggregate(pipeline).toArray();
 	}
 
+	updateMany(filter: Filter<Message>, update: UpdateFilter<Message>) {
+		return this.messages.updateMany(filter, update);
+	}
+
 	async exists(query: Filter<Message>) {
 		const options = { projection: { _id: 1 } };
 		return (await this.messages.findOne(query, options)) !== null;

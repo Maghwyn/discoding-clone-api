@@ -6,8 +6,7 @@ import { Jwt } from '@/common/decorators/jwt.decorator';
 import { JwtAuthGuard } from '@/common/guards/jwt.guard';
 import { ServiceErrorCatcher } from '@/common/error/catch.service';
 import { MessagesService } from '@/routes/messages/messages.service';
-import { DTOSendPrivateMessage, DTOEditMessage, DTOMessageContext } from '@/routes/messages/dto/messages.dto';
-import { MessageContext } from './interfaces/messages.interface';
+import { DTOContextContentMessage, DTOContextMessage } from '@/routes/messages/dto/messages.dto';
 
 @Controller('messages')
 @UseGuards(JwtAuthGuard)
@@ -16,20 +15,27 @@ export class MessagesController {
 	constructor(private readonly messagesService: MessagesService) {}
 
 	@Post('/private')
-	async sendMessage(@Jwt() userId: ObjectId, @Body() body: DTOSendPrivateMessage, @Res() res: Response) {
+	async sendMessage(@Jwt() userId: ObjectId, @Body() body: DTOContextContentMessage, @Res() res: Response) {
 		const conversationId = await this.messagesService.createPrivateMessage(userId, body.contextId, body.content);
 		return res.status(201).json(conversationId);
 	}
 
-	@Delete('/private/:id')
-	async deleteMessage(@Jwt() userId: ObjectId, @Param('id') messageId: string, @Res() res: Response) {
-		await this.messagesService.deletePrivateMessage(userId, messageId);
+
+	@Get('/private/unreads')
+	async retrievePrivateUnreads(@Jwt() userId: ObjectId, @Res() res: Response) {
+		const messages = await this.messagesService.retrievePrivateUnreads(userId);
+		return res.status(200).json(messages);
+	}
+
+	@Post('/private/delete/:id')
+	async deleteMessage(@Jwt() userId: ObjectId, @Param('id') messageId: string, @Body() body: DTOContextMessage,  @Res() res: Response) {
+		await this.messagesService.deletePrivateMessage(userId, messageId, body.contextId);
 		return res.status(200).json();
 	}
 
 	@Patch('/:id')
-	async editMessage(@Jwt() userId: ObjectId, @Param('id') messageId: string, @Body() body: DTOEditMessage, @Res() res: Response) {
-		await this.messagesService.editMessage(userId, messageId, body.content);
+	async editMessage(@Jwt() userId: ObjectId, @Param('id') messageId: string, @Body() body: DTOContextContentMessage, @Res() res: Response) {
+		await this.messagesService.editMessage(userId, messageId, body.contextId, body.content);
 		return res.status(200).json();
 	}
 
